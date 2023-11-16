@@ -1,14 +1,23 @@
 
-// type Props = {}
+//just login on this page... logining in goes to login screen, then profile screen, purchase item, stripe, chekcout, then back to profile screen
+
+import { Link } from "react-router-dom"
 
 function Header() {
   return (
     <>
       <div className="navbar bg-base-200">
         <div className="flex-1">
-          <a className="btn btn-ghost normal-case text-xl">QuantuMetrics</a>
+          <Link to={'/'}>
+          <div className="btn btn-ghost normal-case text-xl">QuantuMetrics</div>
+          </Link>
         </div>
-        <div className="flex-none">
+
+        <Link to={'/auth?type=login'}>
+          <button className="btn btn-primary">Login</button>
+        </Link>
+
+        {/* <div className="flex-none">
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost btn-circle">
               <div className="indicator">
@@ -43,7 +52,9 @@ function Header() {
               <li><a>Logout</a></li>
             </ul>
           </div>
-        </div>
+        </div> */}
+
+
       </div>
     </>
   )

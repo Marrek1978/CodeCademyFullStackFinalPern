@@ -8,8 +8,8 @@ export default {
   ],
   daisyui: {
     themes:true,
-    darkTheme: "dark",
-    base: true, // applies background color and foreground color for root element by default
+    darkTheme: "night",
+    base: false, // applies background color and foreground color for root element by default
   },
   theme: {
     extend: {},

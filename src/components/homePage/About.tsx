@@ -2,7 +2,7 @@
 function About() {
   return (
     <>
-      <div className="card card-side bg-base-200 shadow-xl">
+      <div className="card card-side bg-base-200 shadow-xl max-h-[600px]">
         <figure><img src="/images/fabio-oyXis2kALVg-unsplash.jpg" alt="Movie" /></figure>
         <div className="card-body text-left">
           <h1 className="text-3xl font-bold">About QuantumMetrics</h1>
