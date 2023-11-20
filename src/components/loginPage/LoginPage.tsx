@@ -1,16 +1,25 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useForm, SubmitHandler, FieldValues } from "react-hook-form"
-import { registerUserAxios } from '../../axiosApi/axiosApi.js'
+import { set, useForm } from "react-hook-form"
+import { loginUserAxios, registerUserAxios } from '../../axiosApi/axiosApi.js'
+
+
+import { Navigate } from 'react-router-dom'
 
 import type { LoginData } from "../../types/AuthTypes.js";
+import AuthContext from "../authContext/AuthContext.js";
 
 
 function LoginPage() {
   const [searchParams] = useSearchParams();
+  const [errorMessage, setErrorMessage] = useState<string>();
   const type = searchParams.get("type"); //join or login
   const [loginType, setLoginType] = useState(type || "login"); //join or login
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
+  const [redirectToProfile, setRedirectToProfile] = useState(false);
+
+  const { userID, setUserID } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
 
   const {
     register,
@@ -19,34 +28,47 @@ function LoginPage() {
     formState: { errors },
   } = useForm<LoginData>();
 
+
   useEffect(() => {
     if (type === undefined || type === null) return;
     setLoginType(type);
   }, [type]);
 
-  const bgImageUrl =
-    import.meta.env.BASE_URL + "fabio-oyXis2kALVg-unsplash.jpg";
+
+  useEffect(() => {
+    console.log('useEffect')
+    console.log("🚀 ~ file: LoginPage.tsx:41 ~ useEffect ~ isLoggedIn:", isLoggedIn)
+    if (isLoggedIn) {
+      setRedirectToProfile(true);
+    }
+  }, [isLoggedIn])
+
+  const bgImageUrl = import.meta.env.BASE_URL + "fabio-oyXis2kALVg-unsplash.jpg";
 
   const btnText = loginType === "login" ? "Login" : "Register";
   const linkText = loginType === "login" ? "Register Here" : "Login Here";
   const linkType = loginType === "login" ? "join" : "login";
 
-  const onSubmit = async (data:LoginData) => {
-    // console.log("🚀 ~ file: LoginPage.jsx:30 ~ onSubmit ~ data:", data)
-    //{email: 'asdf@asd', password: 'asdfadsf'}
+  const onSubmit = async (data: LoginData) => {  //{email: 'asdf@asd', password: 'asdfadsf'}
 
-    // if (loginType === 'login') {
-    //   try { } catch (err) {
-    //     setErrorMessage(err);
-    //   }
-    // }
+    if (loginType === 'login') {
+      try {
+        const resData = await loginUserAxios(data);
+
+        if (resData.data?.authed) {
+          setIsLoggedIn(true);
+          setUserID(resData.data?.user_id);
+          setRedirectToProfile(true);
+        }
+      } catch (error) {
+        setErrorMessage(error as string);
+      }
+    }
 
     if (loginType === 'join') {
       try {
         const resData = await registerUserAxios(data);
-        console.log("🚀 ~ file: LoginPage.tsx:45 ~ LoginPage ~ resData:", resData)
-
-
+        if (resData.data?.authed) setRedirectToLogin(true);
       } catch (error) {
         setErrorMessage(error as string);
       }
@@ -69,6 +91,8 @@ function LoginPage() {
 
   return (
     <>
+      {redirectToProfile && <Navigate to="/profile" />}
+      {redirectToLogin && <Navigate to="/auth?type=login" />}
       <div
         className="hero bg-base-200 my-6 h-[800px] "
         style={{ backgroundImage: `url(/images/${bgImageUrl})` }}
@@ -81,7 +105,7 @@ function LoginPage() {
             </p>
           </div>
           <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-            <form className="card-body" onSubmit={handleSubmit(onSubmit) }>
+            <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Email</span>

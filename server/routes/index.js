@@ -1,6 +1,6 @@
 //import route files
 import testRoutes from './test.js';
-import auth from './auth.js';
+import authRoutes from './authRoutes.js';
 //auth routes
 //cusotmer profile
 //cart
@@ -12,11 +12,10 @@ import auth from './auth.js';
 //export app with routes
 const routes = (app) => {
 
-  // app.get("/api", (req, res) => {
-  //   res.json({ message: "Hello from server!" });
-  // });
+  console.log('index')
+ 
   testRoutes(app)
-  auth(app)
+  authRoutes(app)
 
 }
 

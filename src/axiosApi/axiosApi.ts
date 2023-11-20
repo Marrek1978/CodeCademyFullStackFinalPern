@@ -4,22 +4,43 @@ import type { LoginData } from "../types/AuthTypes.js";
 export const apiEndpoint = "http://localhost:3001";
 
 export async function registerUserAxios(data: LoginData) {
-  try {
-    const email = data.email;
-    const password = data.password;
-    const url = `${apiEndpoint}/register`;
+  const email = data.email;
+  const password = data.password;
+  const url = `${apiEndpoint}/register`;
 
-    console.log("🚀 ~ file: axiosApi.ts:14 ~ registerUserAxios ~ url:", url);
-    const response = await axios({
-      method: "GET",
+  try {
+    return await axios({
+      method: "POST",
       data: { email, password },
       withCredentials: false,
-      url: `${apiEndpoint}/register`,
+      url: url,
     });
-    console.log("🚀 ~ file: axiosApi.ts:19 ~ registerUserAxios ~ response:", response)
-
-    return response;
   } catch (error) {
-    return { error: error };
+    return {
+      data: { error: (error as Error).message },
+      status: 500,
+      statusText: "Error",
+    };
+  }
+}
+
+export async function loginUserAxios(data: LoginData) {
+  const email = data.email;
+  const password = data.password;
+  const url = `${apiEndpoint}/login`;
+
+  try {
+    return await axios({
+      method: "POST",
+      data: { email, password },
+      withCredentials: false,
+      url: url,
+    });
+  } catch (error) {
+    return {
+      data: { error: (error as Error).message },
+      status: 500,
+      statusText: "Error",
+    };
   }
 }

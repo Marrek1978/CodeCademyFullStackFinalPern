@@ -1,6 +1,6 @@
 // import("dotenv").then(({ config }) => config());
 import process from "process";
-import 'dotenv/config';
+import "dotenv/config";
 
 const config = {
   SERVER_PORT: process.env.SERVER_PORT,

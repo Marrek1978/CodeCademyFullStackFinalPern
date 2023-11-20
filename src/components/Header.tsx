@@ -1,21 +1,41 @@
 
 //just login on this page... logining in goes to login screen, then profile screen, purchase item, stripe, chekcout, then back to profile screen
 
+import { useContext } from "react";
 import { Link } from "react-router-dom"
+import AuthContext from "./authContext/AuthContext";
 
 function Header() {
+  const { isLoggedIn } = useContext(AuthContext);
+
+
+  const authButton = isLoggedIn
+    ? (
+      <Link to={'/logout'}>
+        <button className="btn btn-primary">Logout</button>
+      </Link>
+    )
+    : (
+      <Link to={'/auth?type=login'}>
+        <button className="btn btn-primary">Login</button>
+      </Link>
+    )
+
+
   return (
     <>
       <div className="navbar bg-base-200">
         <div className="flex-1">
           <Link to={'/'}>
-          <div className="btn btn-ghost normal-case text-xl">QuantuMetrics</div>
+            <div className="btn btn-ghost normal-case text-xl">QuantuMetrics</div>
           </Link>
         </div>
 
-        <Link to={'/auth?type=login'}>
+        {/* <Link to={'/auth?type=login'}>
           <button className="btn btn-primary">Login</button>
-        </Link>
+        </Link> */}
+
+        {authButton}
 
         {/* <div className="flex-none">
           <div className="dropdown dropdown-end">
