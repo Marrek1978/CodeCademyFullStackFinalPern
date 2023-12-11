@@ -19,7 +19,6 @@ function App() {
     // 👆 false parameter is required for react project
   }, [])
 
-  console.log('rerendering App')
   return (
     <>
       <div className=" " >
@@ -31,7 +30,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/auth" element={<LoginPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/user/:userId" element={<ProfilePage />} />
 
                   {/* <Route path="/cart" element={<Cart />} /> */}
                   {/* <Route path="/checkout" element={<Checkout />} /> */}

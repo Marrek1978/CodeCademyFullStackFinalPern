@@ -4,16 +4,32 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom"
 import AuthContext from "./authContext/AuthContext";
+import { logoutUserAxios } from "../axiosApi/axiosApi";
 
 function Header() {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
 
+  const handleLogout = async () => {
+    try {
+      // return await logoutUserAxios();
+      const logoutData = await logoutUserAxios();
+      if (logoutData.data?.authed === false) {
+        setIsLoggedIn(false);
+      }
+    } catch (err) {
+      console.log(err)
+    }
+
+  }
 
   const authButton = isLoggedIn
     ? (
-      <Link to={'/logout'}>
-        <button className="btn btn-primary">Logout</button>
-      </Link>
+
+      <button
+        className="btn btn-primary"
+        onClick={handleLogout}>
+        Logout
+      </button>
     )
     : (
       <Link to={'/auth?type=login'}>

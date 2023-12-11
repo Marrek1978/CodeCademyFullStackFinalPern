@@ -1,4 +1,4 @@
-import { createContext, useState, Dispatch, SetStateAction, ReactNode } from "react";
+import { createContext, useState, Dispatch, SetStateAction, ReactNode, useEffect } from "react";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -20,10 +20,22 @@ interface AuthProviderProps {
   children: ReactNode
 }
 
-
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userID, setUserID] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    const storedIsLoggedIN = localStorage.getItem("isLoggedIn");
+    return storedIsLoggedIN ? JSON.parse(storedIsLoggedIN) : false;
+  });
+  
+  const [userID, setUserID] = useState<string | null>(() => {
+    const storedUserID = localStorage.getItem("userID");
+    return storedUserID ? JSON.parse(storedUserID) : null;
+  
+  });
+
+  useEffect(() => {
+    localStorage.setItem("isLoggedIn", JSON.stringify(isLoggedIn));
+    localStorage.setItem("userID", JSON.stringify(userID));
+  }, [isLoggedIn, userID])
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userID, setUserID }}>

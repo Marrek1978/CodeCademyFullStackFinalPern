@@ -1,3 +1,11 @@
 1. server.js
 index.js
 authRoutes
+
+
+
+
+
+Login
+
+ console.log(' in passport.authenticate ')

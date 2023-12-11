@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { set, useForm } from "react-hook-form"
-import { loginUserAxios, registerUserAxios } from '../../axiosApi/axiosApi.js'
 
+import { useForm } from "react-hook-form"
+import { Toaster, toast } from 'sonner'
 
 import { Navigate } from 'react-router-dom'
+import AuthContext from "../authContext/AuthContext.js";
+import { loginUserAxios, registerUserAxios } from '../../axiosApi/axiosApi.js'
 
 import type { LoginData } from "../../types/AuthTypes.js";
-import AuthContext from "../authContext/AuthContext.js";
-
 
 function LoginPage() {
   const [searchParams] = useSearchParams();
@@ -16,17 +16,23 @@ function LoginPage() {
   const type = searchParams.get("type"); //join or login
   const [loginType, setLoginType] = useState(type || "login"); //join or login
   const [redirectToLogin, setRedirectToLogin] = useState(false);
-  const [redirectToProfile, setRedirectToProfile] = useState(false);
+  const [isRedirectToProfile, setIsRedirectToProfile] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>();
 
-  const { userID, setUserID } = useContext(AuthContext);
-  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
-
+  const { isLoggedIn, setIsLoggedIn, userID , setUserID} = useContext(AuthContext);
   const {
     register,
     handleSubmit,
-    watch,
+    // watch,
     formState: { errors },
   } = useForm<LoginData>();
+
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setIsRedirectToProfile(true);
+    }
+  }, [isLoggedIn])
 
 
   useEffect(() => {
@@ -36,12 +42,29 @@ function LoginPage() {
 
 
   useEffect(() => {
-    console.log('useEffect')
-    console.log("🚀 ~ file: LoginPage.tsx:41 ~ useEffect ~ isLoggedIn:", isLoggedIn)
-    if (isLoggedIn) {
-      setRedirectToProfile(true);
-    }
-  }, [isLoggedIn])
+    if (toastMessage === null || toastMessage === undefined) return;
+    toast.warning(toastMessage, {
+      position: 'top-center',
+      duration: 3000,
+      action: {
+        label: 'Close',
+        onClick: () => console.log('Close'),
+      },
+    })
+  }, [toastMessage])
+
+  useEffect(() => {
+    if (errorMessage === null || errorMessage === undefined) return;
+    toast.error(errorMessage, {
+      position: 'top-center',
+      duration: 3000,
+      action: {
+        label: 'Close',
+        onClick: () => console.log('Close'),
+      },
+    })
+  }, [errorMessage])
+
 
   const bgImageUrl = import.meta.env.BASE_URL + "fabio-oyXis2kALVg-unsplash.jpg";
 
@@ -50,16 +73,20 @@ function LoginPage() {
   const linkType = loginType === "login" ? "join" : "login";
 
   const onSubmit = async (data: LoginData) => {  //{email: 'asdf@asd', password: 'asdfadsf'}
-
     if (loginType === 'login') {
       try {
         const resData = await loginUserAxios(data);
 
         if (resData.data?.authed) {
+          // console.log('authed')
           setIsLoggedIn(true);
-          setUserID(resData.data?.user_id);
-          setRedirectToProfile(true);
+          setUserID(resData.data?.user.id);
+          setIsRedirectToProfile(true);
+        } else {
+          // console.log('not authed')
+          setToastMessage(resData.data?.error)
         }
+
       } catch (error) {
         setErrorMessage(error as string);
       }
@@ -89,9 +116,21 @@ function LoginPage() {
     // }
   };
 
+
+
+
   return (
     <>
-      {redirectToProfile && <Navigate to="/profile" />}
+
+      <div>
+        <Toaster richColors />
+        {/* <button onClick={() => toast.success('My first toast')}>
+          Give me a toast
+        </button> */}
+      </div>
+
+
+      {isRedirectToProfile && userID && <Navigate to={`/user/${userID}`} />}
       {redirectToLogin && <Navigate to="/auth?type=login" />}
       <div
         className="hero bg-base-200 my-6 h-[800px] "

@@ -3,16 +3,10 @@ import { query } from "../dbConnection/dbConnection.js";
 const getUserByEmail = async (email) => {
   //!  validation on email string b4 this step
   // returns a promise
-  try {
-    const results = await query(`SELECT * FROM users WHERE email = $1`, [
-      email,
-    ]);
-    if (results.rows.length === 0) throw new Error("User not found");
-    return results.rows[0];
-  } catch (error) {
-    console.error("Error in getUserByEmail:", error);
-    throw error;
-  }
+  if(!email) throw new Error("Email is required");
+  const results = await query(`SELECT * FROM users WHERE email = $1`, [email]);
+  if (results.rows.length === 0) return null
+  return results.rows[0];
 };
 
 const registerNewUser = async (newUser) => {
@@ -20,7 +14,7 @@ const registerNewUser = async (newUser) => {
     `INSERT INTO users (id, email, password) VALUES ($1, $2, $3) RETURNING *`,
     [newUser.id, newUser.email, newUser.password]
   );
-  if (results.rows.length == 0) throw new Error("User not found");
+  if (results.rows.length == 0) throw new Error("User not Created");
   return results.rows[0];
 };
 

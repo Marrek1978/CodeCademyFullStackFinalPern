@@ -19,26 +19,34 @@ const passportConfig = () => {
   // Passport setup code here
   // ...
 
+  //no credentials - err
+  //no user - !user
+  //wrong password - !match
+  //return user - user
+  //connection, db, server, function errors - err
+
   passport.use(
     new LocalStrategy(
       { usernameField: "email", passwordField: "password" },
       async (email, password, done) => {
         try {
           if (!email || !password)
-            return done(null, false, { error: "Bad Credentials" });
+            //no credentials
+            return done(null, false, { message: "Bad Credentials" });
 
+          //no user
           const user = await getUserByEmail(email);
-          if (!user) return done(null, false, { error: "Email not found." });
+          if (!user) return done(null, false, { message: "Email not found." });
 
+          //wrong password
           const match = await bcrypt.compare(password, user.password);
           if (!match)
-            return done(null, false, { error: "Incorrect password." });
+          return done(null, false, { message: "Incorrect password." });
 
-          if (user && user.id) return done(null, user);
-          return done(null, false)
-          // return done(null, { user, authed: true });
+          //return user
+          if (user) return done(null, user);
         } catch (error) {
-          return done(error);
+          return done(error, false, { error: `Server Error` + error.message });
         }
       }
     )
@@ -64,7 +72,7 @@ const passportConfig = () => {
   // );
 
   passport.serializeUser((userId, done) => {
-    return done(null,userId);
+    return done(null, userId);
   });
 
   passport.deserializeUser((id, done) => {
