@@ -2,7 +2,7 @@ import express from "express";
 import config from "./config.js";
 import allRoutes from "./routes/index.js";
 import  middleware from "./middlewares/middleware.js";
-import passportConfig from './auth/passport.js';
+import passportConfig from './passport/passport.js';
 // import 'dotenv/config';
 
 const app = express();

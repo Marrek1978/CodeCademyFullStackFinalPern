@@ -31,9 +31,8 @@ const authRoutes = (app) => {
 
       if (!user) return res.status(401).json({ error: info.message });
 
-      req.login(user.id, (err) => {
-        if (err)
-          return res.status(500).json({ error: "Could not log this user in." });
+      req.login(user, (err) => {
+        if (err) return res.status(500).json({ error: err });
         res.send({ user, authed: true });
       });
     })(req, res, next);

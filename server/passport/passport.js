@@ -41,7 +41,7 @@ const passportConfig = () => {
           //wrong password
           const match = await bcrypt.compare(password, user.password);
           if (!match)
-          return done(null, false, { message: "Incorrect password." });
+            return done(null, false, { message: "Incorrect password." });
 
           //return user
           if (user) return done(null, user);
@@ -71,15 +71,17 @@ const passportConfig = () => {
   //   )
   // );
 
-  passport.serializeUser((userId, done) => {
-    return done(null, userId);
+  passport.serializeUser((user, done) => {
+    if (user && user.id) return done(null, user.id.trim());
+    return done(new Error("User ID is undefined"));
   });
 
-  passport.deserializeUser((id, done) => {
-    getUserById(id, (error, result) => {
-      if (error) return done(error);
-      return done(null, result);
-    });
+  passport.deserializeUser(async (id, done) => {
+    const userId = id.trim();
+    const user = await getUserById(userId);
+    if (!user)
+      return done(null, false, { error: "User not found at Deserializer." });
+    return done(null, user);
   });
 
   return passport;

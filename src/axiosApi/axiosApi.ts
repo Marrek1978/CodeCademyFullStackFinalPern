@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { LoginData } from "../types/AuthTypes.js";
 
+axios.defaults.withCredentials = true;
 export const apiEndpoint = "http://localhost:3001";
 
 interface ErrorResponse extends Error {
@@ -21,7 +22,6 @@ export async function registerUserAxios(data: LoginData) {
     return await axios({
       method: "POST",
       data: { email, password },
-      withCredentials: false,
       url: url,
     });
   } catch (error) {
@@ -42,7 +42,6 @@ export async function loginUserAxios(data: LoginData) {
     return await axios({
       method: "POST",
       data: { email, password },
-      withCredentials: false,
       url: url,
     });
   } catch (err) {
@@ -66,13 +65,11 @@ export async function loginUserAxios(data: LoginData) {
 }
 
 export async function logoutUserAxios() {
-  console.log("logoutUserAxios");
   const url = `${apiEndpoint}/logout`;
 
   try {
     return await axios({
       method: "get",
-      withCredentials: true,
       url: url,
     });
   } catch (error) {
@@ -90,8 +87,7 @@ export async function getUserDataAxios(id:string)  {
   try {
    const response =  await axios({
       method: "GET",
-      data: { id},
-      withCredentials: false,
+      data: {id},
       url: url,
     });
 

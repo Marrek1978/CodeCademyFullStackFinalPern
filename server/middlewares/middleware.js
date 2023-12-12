@@ -1,8 +1,8 @@
-import bodyParser from "body-parser";
-import cookieParser from "cookie-parser";
 import cors from "cors";
-import session from "express-session";
 import passport from "passport";
+import bodyParser from "body-parser";
+import session from "express-session";
+import cookieParser from "cookie-parser";
 
 export default function middleware(app) {
   app.use(bodyParser.json());
@@ -17,9 +17,15 @@ export default function middleware(app) {
 
   app.use(
     session({
+      //make env variable
       secret: "secretcode",
-      resave: true,
-      saveUninitialized: true,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        // secure: process.env.NODE_ENV === "production", // or your specific environment logic
+        // other cookie options if needed
+      },
     })
   );
 

@@ -3,9 +3,9 @@ import { query } from "../dbConnection/dbConnection.js";
 const getUserByEmail = async (email) => {
   //!  validation on email string b4 this step
   // returns a promise
-  if(!email) throw new Error("Email is required");
+  if (!email) throw new Error("Email is required");
   const results = await query(`SELECT * FROM users WHERE email = $1`, [email]);
-  if (results.rows.length === 0) return null
+  if (results.rows.length === 0) return null;
   return results.rows[0];
 };
 
@@ -18,17 +18,13 @@ const registerNewUser = async (newUser) => {
   return results.rows[0];
 };
 
-const getUserById = async (id, done) => {
+const getUserById = async (id) => {
   try {
-    query(`SELECT * FROM users WHERE id = $1 `, [id], (err, results) => {
-      if (err) return done(err);
-
-      if (results === undefined || results.rows.length === 0)
-        return done(null, false, { message: "User not found" });
-      return done(null, results.rows[0]);
-    });
+    const results = await query(`SELECT * FROM users WHERE id = $1 `, [id]);
+    if (results === undefined || results.rows.length === 0) return null;
+    return results.rows[0];
   } catch (err) {
-    return done(err);
+    throw new Error(err);
   }
 };
 

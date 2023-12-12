@@ -1,20 +1,16 @@
-import { set, useForm } from "react-hook-form";
-import { ProfileData } from "../../types/AuthTypes";
-import { useContext, useEffect, useState } from "react";
-import AuthContext from "../authContext/AuthContext";
+import { useForm } from "react-hook-form";
 import { Navigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+
+import { ProfileData } from "../../types/AuthTypes";
+import AuthContext from "../authContext/AuthContext";
 import { getUserDataAxios } from '../../axiosApi/axiosApi'
+
 
 function ProfilePage() {
 
   const { isLoggedIn, userID } = useContext(AuthContext);
   const [userData, setUserData] = useState<ProfileData>();
-  // const [email, setEmail] = useState<string>();
-  const [password, setPassword] = useState<string>();
-  const [firstName, setFirstName] = useState<string>();
-  const [lastName, setLastName] = useState<string>();
-  const [address, setAddress] = useState<string>();
-  const [phone, setPhone] = useState<string>();
 
 
   const {
@@ -25,7 +21,6 @@ function ProfilePage() {
     formState: { errors },
   } = useForm<ProfileData>();
 
-  console.log("🚀 ~  userData State Var:", userData)
 
   useEffect(() => {
     if (isLoggedIn && userID) {
@@ -40,8 +35,8 @@ function ProfilePage() {
   }, [isLoggedIn, userID])
 
 
-  useEffect(() => {
 
+  useEffect(() => {
     if (!userData) return
     setValue('email', userData.email)
     setValue('password', userData.password)
@@ -49,16 +44,9 @@ function ProfilePage() {
     setValue('lastName', userData.lastName)
     setValue('address', userData.address)
     setValue('phone', userData.phone)
-
-
   }, [userData, setValue])
 
-
-
-
-
   if (!isLoggedIn) return <Navigate to="/auth" />;
-
 
   const onSubmitPersonal = async (data: ProfileData) => {
     console.log(data)
