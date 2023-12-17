@@ -21,21 +21,33 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    const storedIsLoggedIN = localStorage.getItem("isLoggedIn");
-    return storedIsLoggedIN ? JSON.parse(storedIsLoggedIN) : false;
+    const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
+    return storedIsLoggedIn !== null ? JSON.parse(storedIsLoggedIn) : false;
   });
-  
+
+
   const [userID, setUserID] = useState<string | null>(() => {
     const storedUserID = localStorage.getItem("userID");
-    return storedUserID ? JSON.parse(storedUserID) : null;
-  
+    if (storedUserID !== null) {
+      try {
+        return JSON.parse(storedUserID.trim());
+      } catch (error) {
+        console.error("Error parsing userID from localStorage:", error);
+        // Handle the error or return a default value
+        return null;
+      }
+    }
+    return null;
+
   });
+
 
   useEffect(() => {
     localStorage.setItem("isLoggedIn", JSON.stringify(isLoggedIn));
     localStorage.setItem("userID", JSON.stringify(userID));
-  }, [isLoggedIn, userID])
+  }, [isLoggedIn, userID]);
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userID, setUserID }}>

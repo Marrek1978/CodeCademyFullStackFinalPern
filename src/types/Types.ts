@@ -6,14 +6,14 @@ export interface LoginData {
 export interface ProfileData {
   email: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  firstname?: string;
+  lastname?: string;
   address?: string;
   phone?: string;
 }
 
 export interface CardData {
-  cardNumber: string;
-  expirationDate: string;
+  cardnumber: string;
+  expirationdate: string;
   cvv?: string;
 }

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { LoginData } from "../types/AuthTypes.js";
+import type { CardData, LoginData, ProfileData } from "../types/Types.js";
 
 axios.defaults.withCredentials = true;
 export const apiEndpoint = "http://localhost:3001";
@@ -19,14 +19,26 @@ export async function registerUserAxios(data: LoginData) {
   const url = `${apiEndpoint}/register`;
 
   try {
-    return await axios({
+    const response = await axios({
       method: "POST",
       data: { email, password },
       url: url,
     });
-  } catch (error) {
+
+    return response;
+  } catch (err) {
+    const errRes = err as ErrorResponse;
+
+    if (errRes.response.data.type === "credentials") {
+      return {
+        data: { error: errRes.response.data.error },
+        status: 409,
+        statusText: "Error",
+      };
+    }
+
     return {
-      data: { error: (error as Error).message },
+      data: { error: (err as Error).message },
       status: 500,
       statusText: "Error",
     };
@@ -48,7 +60,6 @@ export async function loginUserAxios(data: LoginData) {
     const errRes = err as ErrorResponse;
 
     if (errRes.response.data.type === "credentials") {
-
       return {
         data: { error: errRes.response.data.error },
         status: 401,
@@ -81,20 +92,75 @@ export async function logoutUserAxios() {
   }
 }
 
-
-export async function getUserDataAxios(id:string)  {
+export async function getUserDataAxios(id: string) {
   const url = `${apiEndpoint}/user/${id}`;
   try {
-   const response =  await axios({
+    const response = await axios({
       method: "GET",
-      data: {id},
+      data: { id },
       url: url,
     });
-
-    return response
+    return response;
   } catch (err) {
     return {
-      data: { error: (err as Error).message },
+      data: { error: (err as ErrorResponse).response.data.error },
+      status: 500,
+      statusText: "Error",
+    };
+  }
+}
+
+export async function submitUserDetails(data: ProfileData, id: string) {
+  const url = `${apiEndpoint}/user/${id}`;
+
+  try {
+    const response = await axios({
+      method: "POST",
+      data: { data, id },
+      url: url,
+    });
+    return response;
+  } catch (err) {
+    return {
+      data: { error: (err as ErrorResponse).response.data.error },
+      status: 500,
+      statusText: "Error",
+    };
+  }
+}
+
+export async function getUserCardDetailsAxios(id: string) {
+  const url = `${apiEndpoint}/user/${id}/card`;
+  try {
+    const response = await axios({
+      method: "GET",
+      data: { id },
+      url: url,
+    });
+    return response;
+  } catch (err) {
+    return {
+      data: { error: (err as ErrorResponse).response.data.error },
+      status: 500,
+      statusText: "Error",
+    };
+  }
+}
+
+export async function submitCardDetails(data: CardData, id: string) {
+  const url = `${apiEndpoint}/user/${id}/card`;
+
+  try {
+    const response = await axios({
+      method: "POST",
+      data: { data, id },
+      url: url,
+    });
+    
+    return response;
+  } catch (err) {
+    return {
+      data: { error: (err as ErrorResponse).response.data.error },
       status: 500,
       statusText: "Error",
     };

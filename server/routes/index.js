@@ -11,13 +11,9 @@ import userRoutes from "./userRoutes.js";
 
 //export app with routes
 const routes = (app) => {
-  console.log("index");
-
   testRoutes(app);
   authRoutes(app);
   userRoutes(app);
-
-  
 };
 
 export default routes;

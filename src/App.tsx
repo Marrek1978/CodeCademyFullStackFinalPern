@@ -9,10 +9,13 @@ import HomePage from './components/HomePage';
 import LoginPage from './components/loginPage/LoginPage';
 import ProfilePage from './components/profilePage/ProfilePage';
 import { AuthProvider } from './components/authContext/AuthContext.tsx';
+import SubscriptionsPage from './components/subscriptionsPage/SubscriptionsPage.tsx';
 
 
 function App() {
   // const [count, setCount] = useState(0)
+
+  console.log('app')
 
   useEffect(() => {
     themeChange(false)
@@ -21,7 +24,7 @@ function App() {
 
   return (
     <>
-      <div className=" " >
+      <div >
         <AuthProvider>
           <Router>
             <>
@@ -31,6 +34,8 @@ function App() {
                   <Route path="/" element={<HomePage />} />
                   <Route path="/auth" element={<LoginPage />} />
                   <Route path="/user/:userId" element={<ProfilePage />} />
+                  <Route path="/user/:userId/subscriptions" element={<SubscriptionsPage />} />
+                  
 
                   {/* <Route path="/cart" element={<Cart />} /> */}
                   {/* <Route path="/checkout" element={<Checkout />} /> */}

@@ -71,6 +71,32 @@ const userRoutes = (app) => {
       res.status(500).json({ type: "notAuthed", error: error.message });
     }
   });
+
+
+  app.get("/user/:userId/subscriptions", ensureAuthed, async (req, res) => {
+    try {
+      // const userSub = await submitUserSubscripitonById(req.params.userId);
+      const userSub = 'monthly';
+      if (!userSub)
+        return res
+          .status(404)
+          .json({ type: "noUser", error: "User not found" });
+      res.send({ subscription: userSub });
+    } catch (error) {
+      res.status(500).json({ type: "serverError", error: error.message });
+    }
+  });
+
+  app.post("/user/:userId/subscriptions", ensureAuthed, async (req, res) => {
+    try {
+      //post user subscription after stripe payment
+      res.send({ subscription: 'monthly' });
+    } catch (error) {
+      res.status(500).json({ type: "serverError", error: error.message });
+    }
+  });
+
+
 };
 
 export default userRoutes;

@@ -8,7 +8,7 @@ import { Navigate } from 'react-router-dom'
 import AuthContext from "../authContext/AuthContext.js";
 import { loginUserAxios, registerUserAxios } from '../../axiosApi/axiosApi.js'
 
-import type { LoginData } from "../../types/AuthTypes.js";
+import type { LoginData } from "../../types/Types.js";
 
 function LoginPage() {
   const [searchParams] = useSearchParams();
@@ -19,7 +19,7 @@ function LoginPage() {
   const [isRedirectToProfile, setIsRedirectToProfile] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>();
 
-  const { isLoggedIn, setIsLoggedIn, userID , setUserID} = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn, userID, setUserID } = useContext(AuthContext);
   const {
     register,
     handleSubmit,
@@ -29,9 +29,7 @@ function LoginPage() {
 
 
   useEffect(() => {
-    if (isLoggedIn) {
-      setIsRedirectToProfile(true);
-    }
+    if (isLoggedIn) setIsRedirectToProfile(true);
   }, [isLoggedIn])
 
 
@@ -72,18 +70,16 @@ function LoginPage() {
   const linkText = loginType === "login" ? "Register Here" : "Login Here";
   const linkType = loginType === "login" ? "join" : "login";
 
-  const onSubmit = async (data: LoginData) => {  //{email: 'asdf@asd', password: 'asdfadsf'}
+  const onSubmit = async (loginData: LoginData) => {  //{email: 'asdf@asd', password: 'asdfadsf'}
     if (loginType === 'login') {
       try {
-        const resData = await loginUserAxios(data);
+        const resData = await loginUserAxios(loginData);
 
         if (resData.data?.authed) {
-          // console.log('authed')
           setIsLoggedIn(true);
           setUserID(resData.data?.user.id);
           setIsRedirectToProfile(true);
         } else {
-          // console.log('not authed')
           setToastMessage(resData.data?.error)
         }
 
@@ -94,26 +90,15 @@ function LoginPage() {
 
     if (loginType === 'join') {
       try {
-        const resData = await registerUserAxios(data);
+        const resData = await registerUserAxios(loginData);
+
+        if (resData.data?.error) setToastMessage(resData.data?.error)
         if (resData.data?.authed) setRedirectToLogin(true);
+
       } catch (error) {
         setErrorMessage(error as string);
       }
     }
-
-    // try {
-    //   const res = await registerUserAxios(data);
-
-    //   if (res.data.authed) {
-    //     setRedirect(true);
-    //   }
-
-    //   if (res.data.error) {
-    //     setErrorMessage(res.data.error);
-    //   }
-    // } catch (err) {
-    //   setErrorMessage(err);
-    // }
   };
 
 
@@ -121,12 +106,8 @@ function LoginPage() {
 
   return (
     <>
-
       <div>
         <Toaster richColors />
-        {/* <button onClick={() => toast.success('My first toast')}>
-          Give me a toast
-        </button> */}
       </div>
 
 

@@ -2,61 +2,144 @@ import { useForm } from "react-hook-form";
 import { Navigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 
-import { ProfileData } from "../../types/AuthTypes";
+import { Toaster, toast } from 'sonner'
+
+import { CardData, ProfileData } from "../../types/Types";
 import AuthContext from "../authContext/AuthContext";
-import { getUserDataAxios } from '../../axiosApi/axiosApi'
+import { getUserCardDetailsAxios, getUserDataAxios, submitCardDetails, submitUserDetails } from '../../axiosApi/axiosApi'
 
 
 function ProfilePage() {
 
-  const { isLoggedIn, userID } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn, userID, setUserID } = useContext(AuthContext);
   const [userData, setUserData] = useState<ProfileData>();
+  const [userCCData, setUserCCData] = useState<CardData>();
+  const [toastMessage, setToastMessage] = useState<string | null>();
+  const [toastSuccessMessage, setToastSuccessMessage] = useState<string | null>();
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
 
 
   const {
-    register,
-    setValue,
-    handleSubmit,
+    register: registerPersonal,
+    handleSubmit: handleSubmitPersonal,
+    setValue: setValuePersonal,
     // watch,
-    formState: { errors },
+    formState: { errors: errorsPersonal },
   } = useForm<ProfileData>();
+
+  const {
+    register: registerCard,
+    handleSubmit: handleSubmitCard,
+    formState: { errors: errorsCard },
+    setValue: setValueCard,
+  } = useForm<CardData>();
 
 
   useEffect(() => {
-    if (isLoggedIn && userID) {
-      const getUserData = async () => {
-        try {
-          const response = await getUserDataAxios(userID)
-          setUserData(response.data.user)
-        } catch (err) { throw new Error('error') }
-      }
-      getUserData()
-    }
-  }, [isLoggedIn, userID])
+    if (toastMessage === null || toastMessage === undefined) return;
+    toast.warning(toastMessage, {
+      position: 'top-center',
+      duration: 3000,
+      action: {
+        label: 'Close',
+        onClick: () => console.log('Close'),
+      },
+    })
+  }, [toastMessage])
 
+  useEffect(() => {
+    if (toastSuccessMessage === null || toastSuccessMessage === undefined) return;
+    toast.success(toastSuccessMessage, {
+      position: 'top-center',
+      duration: 3000,
+      action: {
+        label: 'Close',
+        onClick: () => console.log('Close'),
+      },
+    })
+  }, [toastSuccessMessage])
+
+
+  useEffect(() => {
+    if (!isLoggedIn || !userID) return setRedirectToLogin(true);
+
+    const getUserData = async () => {
+      try {
+        const response = await getUserDataAxios(userID as string)
+        if (response.data?.error) {
+          setToastMessage(response.data.error)
+          setRedirectToLogin(true)
+          setIsLoggedIn(false)
+          setUserID(null)
+        } else {
+          setUserData(response.data.user)
+        }
+      } catch (err) {
+        setRedirectToLogin(true)
+      }
+    }
+    getUserData()
+
+    const getUserCCData = async () => {
+
+      try {
+        const response = await getUserCardDetailsAxios(userID as string)
+        if (response.data?.error) return setToastMessage(response.data.error)
+        setUserCCData(response.data.userCCData) // user or type = 'notAuthed' ==> redirect to login
+      } catch (err) {
+        setToastMessage((err as Error).message)
+      }
+    }
+    getUserCCData()
+
+  }, [isLoggedIn, userID, setUserID, setIsLoggedIn])
 
 
   useEffect(() => {
     if (!userData) return
-    setValue('email', userData.email)
-    setValue('password', userData.password)
-    setValue('firstName', userData.firstName)
-    setValue('lastName', userData.lastName)
-    setValue('address', userData.address)
-    setValue('phone', userData.phone)
-  }, [userData, setValue])
+    setValuePersonal('email', userData.email)
+    setValuePersonal('password', userData.password)
+    setValuePersonal('firstname', userData.firstname)
+    setValuePersonal('lastname', userData.lastname)
+    setValuePersonal('address', userData.address)
+    setValuePersonal('phone', userData.phone)
+  }, [userData, setValuePersonal])
+
+
+  useEffect(() => {
+    if (!userCCData) return
+    setValueCard('cardnumber', userCCData.cardnumber)
+    setValueCard('expirationdate', userCCData.expirationdate)
+    setValueCard('cvv', userCCData.cvv)
+  }, [userCCData, setValueCard])
+
 
   if (!isLoggedIn) return <Navigate to="/auth" />;
 
   const onSubmitPersonal = async (data: ProfileData) => {
-    console.log(data)
+    if (!userID) return
+    const response = await submitUserDetails(data, userID)
+    if (response.data.error) return setToastMessage(response.data.error)
+    setToastSuccessMessage('Saved User Details')
   }
-  const onSubmitCC = async (data: ProfileData) => {
-    console.log(data)
+
+
+  const onSubmitCC = async (data: CardData) => {
+    if (!userID) return
+    const response = await submitCardDetails(data, userID)
+    if (response.data.error) return setToastMessage(response.data.error)
+    setToastSuccessMessage('Saved Credit Card Details')
   }
+
 
   return (
     <>
+      <div>
+        <Toaster richColors />
+      </div>
+
+      {redirectToLogin && <Navigate to="/auth?type=login" />}
+
       <div className="card lg:card-side bg-base-100 shadow-xl w-full ">
         <div className="card-body flex-row w-full flex-wrap gap-12  ">
 
@@ -64,7 +147,7 @@ function ProfilePage() {
             <h2 className="card-title">Profile</h2>
             <form id='personal_details_form'
               className="card-body max-w-3xl"
-              onSubmit={handleSubmit(onSubmitPersonal)}
+              onSubmit={handleSubmitPersonal(onSubmitPersonal)}
             >
 
               <div className="form-control max-w-lg">
@@ -75,14 +158,14 @@ function ProfilePage() {
                   type="email"
                   placeholder="Email"
                   className="input input-bordered"
-                  {...register("email", {
+                  {...registerPersonal("email", {
                     required: "An email is required.",
-                  })}  // This should correctly register the email input
+                  })}  // This should correctly registerPersonal the email input
                 />
 
               </div>
               <div className="text-[#e91111] font-medium text-sm">
-                {errors.email?.message as React.ReactNode}
+                {errorsPersonal.email?.message as React.ReactNode}
               </div>
 
 
@@ -90,20 +173,20 @@ function ProfilePage() {
                 <label className="label">
                   <span className="label-text">Password</span>
                 </label>
-                <input
+                {/* <input
                   type="password"
                   placeholder="Password"
                   className="input input-bordered"
-                  {...register("password", {
+                  {...registerPersonal("password", {
                     required: "A password is required.",
                     minLength: {
                       value: 5,
                       message: "Password min length is 5 characters",
                     },
                   })}
-                />
+                /> */}
                 <div className="text-[#e91111] font-medium text-sm mt-2">
-                  {errors.password?.message as React.ReactNode}
+                  {errorsPersonal.password?.message as React.ReactNode}
                 </div>
               </div>
 
@@ -115,7 +198,7 @@ function ProfilePage() {
                   type="text"
                   placeholder="First Name"
                   className="input input-bordered"
-                  {...register("firstName", {
+                  {...registerPersonal("firstname", {
                     required: "A first name is required.",
                     maxLength: {
                       value: 20,
@@ -128,7 +211,7 @@ function ProfilePage() {
                   })}
                 />
                 <div className="text-[#e91111] font-medium text-sm mt-2">
-                  {errors.firstName?.message as React.ReactNode}
+                  {errorsPersonal.firstname?.message as React.ReactNode}
                 </div>
               </div>
 
@@ -141,7 +224,7 @@ function ProfilePage() {
                   type="text"
                   placeholder="Last Name"
                   className="input input-bordered"
-                  {...register("lastName", {
+                  {...registerPersonal("lastname", {
                     required: "A last name is required.",
                     maxLength: {
                       value: 20,
@@ -154,7 +237,7 @@ function ProfilePage() {
                   })}
                 />
                 <div className="text-[#e91111] font-medium text-sm mt-2">
-                  {errors.lastName?.message as React.ReactNode}
+                  {errorsPersonal.lastname?.message as React.ReactNode}
                 </div>
               </div>
 
@@ -166,7 +249,7 @@ function ProfilePage() {
                   type="text"
                   placeholder="Home Address"
                   className="input input-bordered"
-                  {...register("address", {
+                  {...registerPersonal("address", {
                     required: "An address is required.",
                     minLength: {
                       value: 5,
@@ -179,7 +262,7 @@ function ProfilePage() {
                   })}
                 />
                 <div className="text-[#e91111] font-medium text-sm mt-2">
-                  {errors.address?.message as React.ReactNode}
+                  {errorsPersonal.address?.message as React.ReactNode}
                 </div>
               </div>
 
@@ -192,7 +275,7 @@ function ProfilePage() {
                   type="tel"
                   placeholder="Phone Number"
                   className="input input-bordered"
-                  {...register("phone", {
+                  {...registerPersonal("phone", {
                     required: "Phone number is required.",
                     pattern: {
                       value: /^[0-9]{10}$/,
@@ -209,7 +292,7 @@ function ProfilePage() {
                   })}
                 />
                 <div className="text-[#e91111] font-medium text-sm mt-2">
-                  {errors.phone?.message as React.ReactNode}
+                  {errorsPersonal.phone?.message as React.ReactNode}
                 </div>
               </div>
 
@@ -229,10 +312,10 @@ function ProfilePage() {
           <div className="w-full max-w-lg">
             <h2 className="card-title">Credit Card Info</h2>
             <form id='cc_details_form'
-              className="card-body  "
-              onSubmit={handleSubmit(onSubmitCC)}
+              className="card-body"
+              onSubmit={handleSubmitCard(onSubmitCC)}
             >
-              {/* 
+
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Credit Card Numbers</span>
@@ -241,7 +324,7 @@ function ProfilePage() {
                   type="text"
                   placeholder="Credit Card Number"
                   className="input input-bordered"
-                  {...register("cardNumber", {
+                  {...registerCard("cardnumber", {
                     required: "Card number is required",
                     pattern: {
                       value: /^\d{13,16}$/,
@@ -251,7 +334,7 @@ function ProfilePage() {
                   })}
                 />
                 <div className="text-[#e91111] font-medium text-sm mt-2">
-                  {errors.cardNumber?.message as React.ReactNode}
+                  {errorsCard.cardnumber?.message as React.ReactNode}
                 </div>
               </div>
 
@@ -263,7 +346,7 @@ function ProfilePage() {
                   type="text"
                   className="input input-bordered"
                   placeholder="MM/YY"
-                  {...register("expirationDate", {
+                  {...registerCard("expirationdate", {
                     required: "Expiration date is required",
                     pattern: {
                       value: /^(0[1-9]|1[0-2])\/?([0-9]{2})$/,
@@ -273,19 +356,19 @@ function ProfilePage() {
                   })}
                 />
                 <div className="text-[#e91111] font-medium text-sm mt-2">
-                  {errors.expirationDate?.message as React.ReactNode}
+                  {errorsCard.expirationdate?.message as React.ReactNode}
                 </div>
               </div>
 
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Credit Card Numbers</span>
+                  <span className="label-text">CVV Numbers</span>
                 </label>
                 <input
                   type="text"
                   className="input input-bordered"
                   placeholder="CVV"
-                  {...register("cvv", {
+                  {...registerCard("cvv", {
                     required: "CVV is required",
                     pattern: {
                       value: /^\d{3,4}$/,
@@ -295,9 +378,9 @@ function ProfilePage() {
                   })}
                 />
                 <div className="text-[#e91111] font-medium text-sm mt-2">
-                  {errors.expirationDate?.message as React.ReactNode}
+                  {errorsCard.cvv?.message as React.ReactNode}
                 </div>
-              </div> */}
+              </div>
 
 
 

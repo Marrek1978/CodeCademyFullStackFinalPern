@@ -7,7 +7,6 @@ import { ensureNotAuthed } from "../middlewares/authMiddleWares.js";
 
 const authRoutes = (app) => {
   //* *******************   LOCAL LOGIN     ***********************
-  // console.log(" in authRoutes ");
   app.post("/login", ensureNotAuthed, async (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
       if (err) return res.status(500).json({ type: "error", error: err });
@@ -42,7 +41,10 @@ const authRoutes = (app) => {
         return res.status(500).json({ error: error.message });
     }
 
-    if (user) return res.status(409).json({  type: "credentials", error: "Email already in use" });
+    if (user)
+      return res
+        .status(409)
+        .json({ type: "credentials", error: "Email already in use" });
 
     const newId = uuidv4();
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -58,12 +60,10 @@ const authRoutes = (app) => {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-
   });
 
   //* *******************   Local Logout     ***********************
   app.get("/logout", (req, res) => {
-    console.log("in logout route");
     req.logout((err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.send({ authed: false });

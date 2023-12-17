@@ -1,11 +1,27 @@
-1. server.js
-index.js
-authRoutes
+post bird create table
 
 
+CREATE TABLE users (
+    id character(32) PRIMARY KEY,
+    email varchar(50) NOT NULL UNIQUE,
+    password varchar(50) NOT NULL,
+    firstName varchar(50),
+    lastName varchar(50),
+    address varchar(100),
+    phone varchar(13),
+    googleId varchar(50),
+    facebookId varchar(50),
+    twitterId varchar(50),
+    githubId varchar(50)
+);
 
 
+CREATE TABLE ccdata (
+    id character(32) PRIMARY KEY,
+    userId character(32) NOT NULL UNIQUE ,
+    cardnumber varchar(20) NOT NULL UNIQUE,
+    expirationdate varchar(5),
+    cvv varchar(4),
+     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
 
-Login
-
- console.log(' in passport.authenticate ')
