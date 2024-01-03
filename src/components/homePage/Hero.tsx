@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 function Hero() {
 
@@ -11,7 +12,9 @@ function Hero() {
           <div className="max-w-md">
             <h1 className="mb-5 text-5xl font-bold">QuantumFusion: The Greatest Software Ever Created!</h1>
             <p className="mb-5">Revolutionize Your Business with Unmatched Performance, Security, and Support</p>
-            <button className="btn btn-primary">Get Started with QuantumFusion Today</button>
+            <Link to='/auth'>
+              <button className="btn btn-primary">Start Your Free Trial Now</button>
+            </Link>
           </div>
         </div>
       </div>

@@ -16,14 +16,6 @@ import { getUserByEmail, getUserById } from "../dbQueries/authQueries.js";
 // const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
 const passportConfig = () => {
-  // Passport setup code here
-  // ...
-
-  //no credentials - err
-  //no user - !user
-  //wrong password - !match
-  //return user - user
-  //connection, db, server, function errors - err
 
   passport.use(
     new LocalStrategy(

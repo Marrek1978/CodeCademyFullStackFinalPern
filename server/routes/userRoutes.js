@@ -96,7 +96,6 @@ const userRoutes = (app) => {
     }
   });
 
-
 };
 
 export default userRoutes;

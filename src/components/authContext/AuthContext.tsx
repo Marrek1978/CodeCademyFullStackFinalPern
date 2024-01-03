@@ -24,29 +24,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
-    return storedIsLoggedIn !== null ? JSON.parse(storedIsLoggedIn) : false;
+    if (storedIsLoggedIn === null || storedIsLoggedIn === undefined) return false
+    return JSON.parse(storedIsLoggedIn)
   });
-
 
   const [userID, setUserID] = useState<string | null>(() => {
-    const storedUserID = localStorage.getItem("userID");
-    if (storedUserID !== null) {
-      try {
-        return JSON.parse(storedUserID.trim());
-      } catch (error) {
-        console.error("Error parsing userID from localStorage:", error);
-        // Handle the error or return a default value
-        return null;
-      }
+    const storedUserID = localStorage.getItem("userID")?.trim();
+    if (storedUserID === null || storedUserID === undefined || storedUserID === "undefined") return null
+
+    try {
+      return JSON.parse(storedUserID?.trim());
+    } catch (error) {
+      console.error("Error parsing userID from localStorage:", error);
+      // Handle the error or return a default value
+      return null;
     }
-    return null;
-
   });
-
 
   useEffect(() => {
     localStorage.setItem("isLoggedIn", JSON.stringify(isLoggedIn));
-    localStorage.setItem("userID", JSON.stringify(userID));
+    localStorage.setItem("userID", JSON.stringify(userID?.trim()));
   }, [isLoggedIn, userID]);
 
   return (

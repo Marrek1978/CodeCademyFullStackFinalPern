@@ -156,9 +156,60 @@ export async function submitCardDetails(data: CardData, id: string) {
       data: { data, id },
       url: url,
     });
-    
+
     return response;
   } catch (err) {
+    return {
+      data: { error: (err as ErrorResponse).response.data.error },
+      status: 500,
+      statusText: "Error",
+    };
+  }
+}
+
+
+export interface StripeSessionResponse {
+  clientSecret?: string ;
+  data?:{ error: string};
+  status?: number;
+  statusText?: string;
+}
+
+
+
+export const getStripSessionAxios = async(): Promise<StripeSessionResponse> => {
+  const url = `${apiEndpoint}/create-checkout-session`;
+
+  try {
+    const stripeRes = await axios({
+      method: "POST",
+      data: { url },
+      url: url,
+    });
+    return  stripeRes.data.clientSecret;
+
+  } catch (err) {
+    return {
+      data: { error: err as string},
+      status: 500,
+      statusText: "Error",
+    };
+  }
+}
+
+export const getStripeSessionStatus = async (sessionId: string) => {
+  const url = `${apiEndpoint}/session-status?session_id=${sessionId}`;
+
+  try {
+    const response = await axios({
+      method: "GET",
+      data: { sessionId },
+      url: url,
+    });
+    console.log("🚀 ~ file: axiosApi.ts:209 ~ getStripeSessionStatus ~ response:", response)
+    return response;
+  } catch (err) {
+    console.log("🚀 ~ file: axiosApi.ts:212 ~ getStripeSessionStatus ~ err:", err)
     return {
       data: { error: (err as ErrorResponse).response.data.error },
       status: 500,

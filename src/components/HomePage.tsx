@@ -1,5 +1,5 @@
 import About from './homePage/About'
-import Cta from './homePage/CTA'
+import Cta from './homePage/Cta'
 import Features from './homePage/features/Features'
 import Hero from './homePage/Hero'
 import StatsLayout from './homePage/stats/StatsLayout'

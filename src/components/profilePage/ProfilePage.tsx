@@ -18,7 +18,6 @@ function ProfilePage() {
   const [toastSuccessMessage, setToastSuccessMessage] = useState<string | null>();
   const [redirectToLogin, setRedirectToLogin] = useState(false);
 
-
   const {
     register: registerPersonal,
     handleSubmit: handleSubmitPersonal,
@@ -391,6 +390,14 @@ function ProfilePage() {
                 </button>
               </div>
             </form>
+          </div>
+
+
+          {/* //*********   SUBSCRIPTION INFO  ********************************  */}
+
+          <div className="w-full max-w-lg">
+            <h2 className="card-title">Current Subscription</h2>
+            <p> info from db</p> or nothing
           </div>
 
         </div>

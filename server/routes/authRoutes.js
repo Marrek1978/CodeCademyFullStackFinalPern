@@ -6,6 +6,7 @@ import { getUserByEmail, registerNewUser } from "../dbQueries/authQueries.js";
 import { ensureNotAuthed } from "../middlewares/authMiddleWares.js";
 
 const authRoutes = (app) => {
+  
   //* *******************   LOCAL LOGIN     ***********************
   app.post("/login", ensureNotAuthed, async (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
@@ -64,11 +65,17 @@ const authRoutes = (app) => {
 
   //* *******************   Local Logout     ***********************
   app.get("/logout", (req, res) => {
+    console.log("in logout");
     req.logout((err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.send({ authed: false });
     });
   });
+
+
+
+
+
 };
 
 export default authRoutes;

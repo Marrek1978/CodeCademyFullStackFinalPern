@@ -16,7 +16,9 @@ function LoginPage() {
   const type = searchParams.get("type"); //join or login
   const [loginType, setLoginType] = useState(type || "login"); //join or login
   const [redirectToLogin, setRedirectToLogin] = useState(false);
+  console.log("🚀 ~ file: LoginPage.tsx:19 ~ LoginPage ~ redirectToLogin:", redirectToLogin)
   const [isRedirectToProfile, setIsRedirectToProfile] = useState(false);
+  console.log("🚀 ~ file: LoginPage.tsx:20 ~ LoginPage ~ isRedirectToProfile:", isRedirectToProfile)
   const [toastMessage, setToastMessage] = useState<string | null>();
 
   const { isLoggedIn, setIsLoggedIn, userID, setUserID } = useContext(AuthContext);
@@ -29,8 +31,8 @@ function LoginPage() {
 
 
   useEffect(() => {
-    if (isLoggedIn) setIsRedirectToProfile(true);
-  }, [isLoggedIn])
+    if (isLoggedIn && userID) setIsRedirectToProfile(true);
+  }, [isLoggedIn, userID])
 
 
   useEffect(() => {
@@ -77,7 +79,7 @@ function LoginPage() {
 
         if (resData.data?.authed) {
           setIsLoggedIn(true);
-          setUserID(resData.data?.user.id);
+          setUserID(resData.data?.user.id.trim());
           setIsRedirectToProfile(true);
         } else {
           setToastMessage(resData.data?.error)
@@ -101,7 +103,8 @@ function LoginPage() {
     }
   };
 
-
+  console.log('-', userID?.trim(), '-')
+  console.log('isRedirectToProfile && userID', isRedirectToProfile, userID)
 
 
   return (
@@ -111,7 +114,8 @@ function LoginPage() {
       </div>
 
 
-      {isRedirectToProfile && userID && <Navigate to={`/user/${userID}`} />}
+
+      {isRedirectToProfile && userID && <Navigate to={`/user/${userID.trim()}`} />}
       {redirectToLogin && <Navigate to="/auth?type=login" />}
       <div
         className="hero bg-base-200 my-6 h-[800px] "

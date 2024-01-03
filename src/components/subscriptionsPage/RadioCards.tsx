@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom';
 
 // type Props = {}
 
@@ -36,16 +37,25 @@ const yearlyCard: CardType = {
 
 
 
-const CancelAnytimeCard: CardType = {
-  name: 'Cancel Anytime',
-  description: 'No commitments',
-  price: 0,
-  id: 4,
-  discount: 0,
-};
+// const CancelAnytimeCard: CardType = {
+//   name: 'Cancel Anytime',
+//   description: 'No commitments',
+//   price: 0,
+//   id: 4,
+//   discount: 0,
+// };
 
 
-function RadioCard() {
+//load subscription data from backend
+//set state to subscription data
+// button should be disabled if no subscription is selected
+//change button text to show 'change subscription'
+
+//add query param to url, for subscription id example /checkout?subscriptionId=1
+// add products to stripe
+//make lookup table.
+
+function RadioCards() {
   const [selectedValue, setSelectedValue] = useState<string>('');
 
   const handleChange = (value: string) => {
@@ -55,7 +65,7 @@ function RadioCard() {
   return (
     <>
       < div className=' w-full m-auto flex gap-6 flex-wrap justify-center'>
-        {[SevenDaysCard, monthlyCard, yearlyCard, CancelAnytimeCard].map((option) => (
+        {[SevenDaysCard, monthlyCard, yearlyCard].map((option) => (
           <label key={option.id} className={`card w-96 bg-primary text-primary-content  ${selectedValue === option.id.toString() ? 'ring ring-offset-2 ring-primary' : ''}`}>
             <input
               type="radio"
@@ -68,16 +78,30 @@ function RadioCard() {
             <div className="card-body">
               <h2 className="card-title">{option.name}</h2>
               <p>${option.price} {option.description}</p>
-            
+
             </div>
           </label>
         ))}
       </div>
-      <div className='mt-24 w-full'>
-        <button className="btn btn-primary btn-outline w-80">Checkout</button>
+
+      <div>
+        <h1 className='text-3xl mt-6'> Cancel Anytime</h1>
+        <p>No Commitments</p>
+      </div>
+
+
+      <div className='mt-12 w-full'>
+        <Link to={`/checkout?subscriptionId=${selectedValue}`}>
+          <button
+            className="btn btn-primary btn-outline w-80"
+            disabled={!selectedValue}
+          >
+            Checkout
+          </button>
+        </Link>
       </div>
     </>
   );
 }
 
-export default RadioCard
+export default RadioCards
