@@ -13,6 +13,16 @@ interface ErrorResponse extends Error {
   };
 }
 
+function returnErrorObj(err: string, status: number, statusText: string) {
+  return {
+    data: { error: err },
+    status: status,
+    statusText: statusText,
+  };
+}
+
+//***************   USER DETAILS **************************** */
+
 export async function registerUserAxios(data: LoginData) {
   const email = data.email;
   const password = data.password;
@@ -30,18 +40,14 @@ export async function registerUserAxios(data: LoginData) {
     const errRes = err as ErrorResponse;
 
     if (errRes.response.data.type === "credentials") {
-      return {
-        data: { error: errRes.response.data.error },
-        status: 409,
-        statusText: "Error",
-      };
+      return returnErrorObj(errRes.response.data.error, 409, "Error");
     }
 
-    return {
-      data: { error: (err as Error).message },
-      status: 500,
-      statusText: "Error",
-    };
+    if (errRes.response.data.error) {
+      return returnErrorObj(errRes.response.data.error, 500, "Error");
+    }
+
+    return returnErrorObj((err as Error).message, 500, "Error");
   }
 }
 
@@ -60,18 +66,10 @@ export async function loginUserAxios(data: LoginData) {
     const errRes = err as ErrorResponse;
 
     if (errRes.response.data.type === "credentials") {
-      return {
-        data: { error: errRes.response.data.error },
-        status: 401,
-        statusText: "Error",
-      };
+      return returnErrorObj(errRes.response.data.error, 401, "Error");
     }
 
-    return {
-      data: { error: (err as Error).message },
-      status: 500,
-      statusText: "Error",
-    };
+    return returnErrorObj((err as Error).message, 500, "Error");
   }
 }
 
@@ -84,11 +82,7 @@ export async function logoutUserAxios() {
       url: url,
     });
   } catch (error) {
-    return {
-      data: { error: (error as Error).message },
-      status: 500,
-      statusText: "Error",
-    };
+    return returnErrorObj((error as Error).message, 500, "Error");
   }
 }
 
@@ -102,11 +96,11 @@ export async function getUserDataAxios(id: string) {
     });
     return response;
   } catch (err) {
-    return {
-      data: { error: (err as ErrorResponse).response.data.error },
-      status: 500,
-      statusText: "Error",
-    };
+    return returnErrorObj(
+      (err as ErrorResponse).response.data.error,
+      500,
+      "Error"
+    );
   }
 }
 
@@ -121,14 +115,15 @@ export async function submitUserDetails(data: ProfileData, id: string) {
     });
     return response;
   } catch (err) {
-    return {
-      data: { error: (err as ErrorResponse).response.data.error },
-      status: 500,
-      statusText: "Error",
-    };
+    return returnErrorObj(
+      (err as ErrorResponse).response.data.error,
+      500,
+      "Error"
+    );
   }
 }
 
+//***************   USER CC DETAILS **************************** */
 export async function getUserCardDetailsAxios(id: string) {
   const url = `${apiEndpoint}/user/${id}/card`;
   try {
@@ -139,11 +134,11 @@ export async function getUserCardDetailsAxios(id: string) {
     });
     return response;
   } catch (err) {
-    return {
-      data: { error: (err as ErrorResponse).response.data.error },
-      status: 500,
-      statusText: "Error",
-    };
+    return returnErrorObj(
+      (err as ErrorResponse).response.data.error,
+      500,
+      "Error"
+    );
   }
 }
 
@@ -159,45 +154,62 @@ export async function submitCardDetails(data: CardData, id: string) {
 
     return response;
   } catch (err) {
-    return {
-      data: { error: (err as ErrorResponse).response.data.error },
-      status: 500,
-      statusText: "Error",
-    };
+    return returnErrorObj(
+      (err as ErrorResponse).response.data.error,
+      500,
+      "Error"
+    );
   }
 }
 
+export async function submitSubToDbAxios(userID: string, subFrequency: string) {
+  const url = `${apiEndpoint}/user/${userID}/subscription`;
+
+  try {
+    const response = await axios({
+      method: "POST",
+      data: { userID, subFrequency },
+      url: url,
+    });
+
+    return response;
+  } catch (err) {
+    return returnErrorObj(
+      (err as ErrorResponse).response.data.error,
+      500,
+      "Error"
+    );
+  }
+}
+
+//???? STRIPE ?????????????????????????????
 
 export interface StripeSessionResponse {
-  clientSecret?: string ;
-  data?:{ error: string};
+  clientSecret?: string;
+  data?: { error: string };
   status?: number;
   statusText?: string;
 }
 
-
-
-export const getStripSessionAxios = async(): Promise<StripeSessionResponse> => {
+export const getStripSessionAxios = async (
+  subscriptionId: string
+): Promise<StripeSessionResponse> => {
   const url = `${apiEndpoint}/create-checkout-session`;
 
   try {
     const stripeRes = await axios({
       method: "POST",
-      data: { url },
+      data: { subscriptionId },
       url: url,
     });
-    return  stripeRes.data.clientSecret;
 
+    return stripeRes.data.clientSecret;
   } catch (err) {
-    return {
-      data: { error: err as string},
-      status: 500,
-      statusText: "Error",
-    };
+    return returnErrorObj(err as string, 500, "Error");
   }
-}
+};
 
-export const getStripeSessionStatus = async (sessionId: string) => {
+export const getStripeSessionStatuAxios = async (sessionId: string) => {
   const url = `${apiEndpoint}/session-status?session_id=${sessionId}`;
 
   try {
@@ -206,14 +218,13 @@ export const getStripeSessionStatus = async (sessionId: string) => {
       data: { sessionId },
       url: url,
     });
-    console.log("🚀 ~ file: axiosApi.ts:209 ~ getStripeSessionStatus ~ response:", response)
+
     return response;
   } catch (err) {
-    console.log("🚀 ~ file: axiosApi.ts:212 ~ getStripeSessionStatus ~ err:", err)
-    return {
-      data: { error: (err as ErrorResponse).response.data.error },
-      status: 500,
-      statusText: "Error",
-    };
+    return returnErrorObj(
+      (err as ErrorResponse).response.data.error,
+      500,
+      "Error"
+    );
   }
-}
+};

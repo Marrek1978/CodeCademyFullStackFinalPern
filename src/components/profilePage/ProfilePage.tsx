@@ -2,21 +2,21 @@ import { useForm } from "react-hook-form";
 import { Navigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 
-import { Toaster, toast } from 'sonner'
+import { toast } from 'sonner'
 
-import { CardData, ProfileData } from "../../types/Types";
 import AuthContext from "../authContext/AuthContext";
+import { CardData, ProfileData } from "../../types/Types";
 import { getUserCardDetailsAxios, getUserDataAxios, submitCardDetails, submitUserDetails } from '../../axiosApi/axiosApi'
 
 
 function ProfilePage() {
 
-  const { isLoggedIn, setIsLoggedIn, userID, setUserID } = useContext(AuthContext);
   const [userData, setUserData] = useState<ProfileData>();
   const [userCCData, setUserCCData] = useState<CardData>();
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>();
   const [toastSuccessMessage, setToastSuccessMessage] = useState<string | null>();
-  const [redirectToLogin, setRedirectToLogin] = useState(false);
+  const { isLoggedIn, setIsLoggedIn, userID, setUserID } = useContext(AuthContext);
 
   const {
     register: registerPersonal,
@@ -133,9 +133,9 @@ function ProfilePage() {
 
   return (
     <>
-      <div>
+      {/* <div>
         <Toaster richColors />
-      </div>
+      </div> */}
 
       {redirectToLogin && <Navigate to="/auth?type=login" />}
 

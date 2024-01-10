@@ -1,5 +1,7 @@
 const ensureAuthed = (req, res, next) => {
+  console.log( ' in ensureAuthed')
   if (req.isAuthenticated() || req.session.isLoggedIn) return next();
+  console.log( '  not Authed')
   res.status(401).json({ type: "notAuthed", error: "Not authenticated" });
 };
 

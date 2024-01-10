@@ -25,3 +25,35 @@ CREATE TABLE ccdata (
      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE userSubscription (
+  id character(32) PRIMARY KEY,
+	 userId character(32) NOT NULL UNIQUE ,
+  	subscription varchar(50),
+   FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+  );
+
+
+
+
+  Login => Page                      AXIOS                                  ROUTE                     QUERY                   
+  => Register(join)         ->      registerUserAxios        ->          /register`         ->    getUserByEmail  
+        setErrorMessage             <-errorObj                     <-  return res.status(409)           <-  user
+    setErrorMessage                 <-errorObj                      <- return res.status(500)          <- error
+                                                                                                        
+                                                                                                  <- return null
+                                                                                                 > registerNewUser                                
+      setErrorMessage             <-errorObj                          <- return res.status(500)          <- error
+    setToast                        <-  response                      <- return res.status(201)          <- user
+
+
+    => Login                            loginUserAxios                    /login                    passport auth
+        setErrorMessage                   <-errorObj                <- return res .status(500)      <- err
+        setErrorMessage                  <-errorObj               <- return res .status(401)     <- info
+        setErrorMessage                  <-errorObj                <- return res .status(401)       <- !user
+
+                                                                                                    <-user
+                                                                                                    > req.login 
+    setToastMessage                   <-errorObj              <-res.status(500)                     <- err
+    setToastMessage                    <-response              <-res.send({ user, authed: true });  <- user
+
+                                           

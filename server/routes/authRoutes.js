@@ -6,7 +6,6 @@ import { getUserByEmail, registerNewUser } from "../dbQueries/authQueries.js";
 import { ensureNotAuthed } from "../middlewares/authMiddleWares.js";
 
 const authRoutes = (app) => {
-  
   //* *******************   LOCAL LOGIN     ***********************
   app.post("/login", ensureNotAuthed, async (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
@@ -59,7 +58,7 @@ const authRoutes = (app) => {
       const registeredUser = await registerNewUser(newUser);
       return res.status(201).json({ user: registeredUser, authed: true });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
     }
   });
 
@@ -71,11 +70,6 @@ const authRoutes = (app) => {
       res.send({ authed: false });
     });
   });
-
-
-
-
-
 };
 
 export default authRoutes;

@@ -23,11 +23,11 @@ passportConfig();
 routes(app);
 
 // Error handling middleware (optional)
-app.use((err, req, res) => {
-  console.log("in error handler");
-  console.error(err.stack);
-  res.status(500).send("Something broke!");
-});
+// app.use((err, req, res) => {
+//   console.log("in error handler");
+//   console.error(err.stack);
+//   res.status(500).send("Something broke!");
+// });
 
 // / Catch 404 and forward to error handler
 app.use((req, res) => {

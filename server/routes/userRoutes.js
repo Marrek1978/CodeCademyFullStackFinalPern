@@ -4,6 +4,7 @@ import {
   postUserDataById,
   postUserCCDataById,
   getUserCardDataById,
+  postUserSubDataByUserId
 } from "../dbQueries/userQueries.js";
 
 const userRoutes = (app) => {
@@ -72,11 +73,10 @@ const userRoutes = (app) => {
     }
   });
 
-
   app.get("/user/:userId/subscriptions", ensureAuthed, async (req, res) => {
     try {
       // const userSub = await submitUserSubscripitonById(req.params.userId);
-      const userSub = 'monthly';
+      const userSub = "monthly";
       if (!userSub)
         return res
           .status(404)
@@ -87,15 +87,23 @@ const userRoutes = (app) => {
     }
   });
 
-  app.post("/user/:userId/subscriptions", ensureAuthed, async (req, res) => {
+  app.post("/user/:userId/subscription", ensureAuthed, async (req, res) => {
+    console.log("🚀 ~ file: userRoutes.js:91 ~ app.post ~ req:", req.body)
+    console.log("in post user subscription");
     try {
-      //post user subscription after stripe payment
-      res.send({ subscription: 'monthly' });
+      const userID = req.body.userID;
+      console.log("🚀 ~ file: userRoutes.js:94 ~ app.post ~ userID:", userID)
+      const subFrequency = req.body.subFrequency;
+      console.log("🚀 ~ file: userRoutes.js:96 ~ app.post ~ subFrequency:", subFrequency)
+
+      const response = await postUserSubDataByUserId(userID, subFrequency);
+      console.log("🚀 ~ file: userRoutes.js:97 ~ app.post ~ response:", response)
+      res.send({ user: response });
     } catch (error) {
+      console.log("🚀 ~ file: userRoutes.js:100 ~ app.post ~ error:", error)
       res.status(500).json({ type: "serverError", error: error.message });
     }
   });
-
 };
 
 export default userRoutes;

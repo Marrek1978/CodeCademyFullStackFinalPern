@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
+import { toast } from 'sonner'
 import { useForm } from "react-hook-form"
-import { Toaster, toast } from 'sonner'
 
 import { Navigate } from 'react-router-dom'
 import AuthContext from "../authContext/AuthContext.js";
@@ -12,13 +12,11 @@ import type { LoginData } from "../../types/Types.js";
 
 function LoginPage() {
   const [searchParams] = useSearchParams();
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [errorMessage, setErrorMessage] = useState<string|null>();
   const type = searchParams.get("type"); //join or login
   const [loginType, setLoginType] = useState(type || "login"); //join or login
   const [redirectToLogin, setRedirectToLogin] = useState(false);
-  console.log("🚀 ~ file: LoginPage.tsx:19 ~ LoginPage ~ redirectToLogin:", redirectToLogin)
   const [isRedirectToProfile, setIsRedirectToProfile] = useState(false);
-  console.log("🚀 ~ file: LoginPage.tsx:20 ~ LoginPage ~ isRedirectToProfile:", isRedirectToProfile)
   const [toastMessage, setToastMessage] = useState<string | null>();
 
   const { isLoggedIn, setIsLoggedIn, userID, setUserID } = useContext(AuthContext);
@@ -40,6 +38,7 @@ function LoginPage() {
     setLoginType(type);
   }, [type]);
 
+  //!!! clear setErrorMessage, setToastMessage after 3 seconds
 
   useEffect(() => {
     if (toastMessage === null || toastMessage === undefined) return;
@@ -51,6 +50,9 @@ function LoginPage() {
         onClick: () => console.log('Close'),
       },
     })
+ 
+    
+    setTimeout(() => setToastMessage(null), 3000);
   }, [toastMessage])
 
   useEffect(() => {
@@ -63,6 +65,9 @@ function LoginPage() {
         onClick: () => console.log('Close'),
       },
     })
+
+    setTimeout(() => setErrorMessage(null), 3000);
+
   }, [errorMessage])
 
 
@@ -93,7 +98,6 @@ function LoginPage() {
     if (loginType === 'join') {
       try {
         const resData = await registerUserAxios(loginData);
-
         if (resData.data?.error) setToastMessage(resData.data?.error)
         if (resData.data?.authed) setRedirectToLogin(true);
 
@@ -103,17 +107,10 @@ function LoginPage() {
     }
   };
 
-  console.log('-', userID?.trim(), '-')
-  console.log('isRedirectToProfile && userID', isRedirectToProfile, userID)
 
 
   return (
     <>
-      <div>
-        <Toaster richColors />
-      </div>
-
-
 
       {isRedirectToProfile && userID && <Navigate to={`/user/${userID.trim()}`} />}
       {redirectToLogin && <Navigate to="/auth?type=login" />}

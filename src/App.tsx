@@ -13,6 +13,7 @@ import LogoutPage from './components/logoutPage/LogoutPage.tsx';
 import CheckoutForm from './components/stripe/CheckoutForm.tsx';
 import { AuthProvider } from './components/authContext/AuthContext.tsx';
 import SubscriptionsPage from './components/subscriptionsPage/SubscriptionsPage.tsx';
+import { Toaster } from 'sonner';
 
 function App() {
 
@@ -23,6 +24,10 @@ function App() {
 
   return (
     <>
+      <div>
+        <Toaster richColors />
+      </div>
+      
       <div >
         <AuthProvider>
           <Router>
@@ -39,7 +44,6 @@ function App() {
                   <Route path="/return" element={<Return />} />
 
                   {/* <Route path="/cart" element={<Cart />} /> */}
-                  {/* <Route path="/checkout" element={<Checkout />} /> */}
 
                   {/* <Route path="/auth/github" /> */}
                   <Route path="*" element={<NotFound />} />

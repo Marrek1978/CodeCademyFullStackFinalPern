@@ -2,7 +2,7 @@
 function About() {
   return (
     <>
-      <div className="card card-side bg-base-200 shadow-xl max-h-[600px]">
+      <div className="card card-side bg-base-200 shadow-xl max-h-[400px]">
 
         <div className='  flex items-center'>
           <div className="card-body text-left">
